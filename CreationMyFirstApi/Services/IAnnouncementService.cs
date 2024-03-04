@@ -9,7 +9,7 @@ namespace CreationMyFirstApi.Services
         Task<AnnouncementEntity> Create(AnnouncementEntity announcement);
         Task<AnnouncementEntity> Update(AnnouncementEntity announcement);
         bool Delete(int id);
-        Task<IEnumerable<AnnouncementDetails>> GetSelectedAnnouncementDetails(int id);
+        Task<IList<AnnouncementEntity>> GetSelectedAnnouncementDetails(int id);
 
     }
 }

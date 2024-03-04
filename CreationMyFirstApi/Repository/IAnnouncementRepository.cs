@@ -9,6 +9,6 @@ namespace CreationMyFirstApi.Repository
         Task<AnnouncementEntity> Create(AnnouncementEntity announcement);
         Task<AnnouncementEntity> Update(AnnouncementEntity announcement);
         bool Delete(int ID);
-        Task<IEnumerable<AnnouncementDetails>> GetSelectedAnnouncementDetails(int id);
+        Task<IEnumerable<AnnouncementEntity>> GetSelectedAnnouncementDetails(IList<AnnouncementEntity> id);
     }
 }

@@ -64,17 +64,11 @@ namespace CreationMyFirstApi.Repository
             }
             return result;
         }
-        public async Task<IEnumerable<AnnouncementDetails>> GetSelectedAnnouncementDetails(int id)
+        public async Task<IEnumerable<AnnouncementEntity>> GetSelectedAnnouncementDetails(IList<AnnouncementEntity> id)
         {
-            return await announcementDetailsDbContext.AnnouncementsDetails.ToListAsync();
+            return await announcementDbContext.Announcements.ToListAsync();
         }
 
-        public int Key { get; set; }
-        public IEnumerable<int> Key2 { get; set; }
-        public double Similarity { get; set; }
-        public AnnouncementRepository Merge(AnnouncementRepository p)
-        {
-            return new AnnouncementRepository { Key = this.Key, Similarity = this.Similarity };
-        }
+        
     }
 }
