@@ -14,6 +14,9 @@ namespace CreationMyFirstApi.Services
             announcementRepository = context ??
                 throw new ArgumentNullException(nameof(context));
         }
+        public AnnouncementService()
+        {
+        }
         public async Task<IEnumerable<AnnouncementEntity>> Get()
         {
             using (DbContext connection = new AnnouncementDbContext())
@@ -39,21 +42,25 @@ namespace CreationMyFirstApi.Services
         {
             return announcementRepository.Delete(id);
         }
-        public async Task<IEnumerable<AnnouncementDetails>> GetSelectedAnnouncementDetails(int id)
-
+        public async Task<IList<AnnouncementEntity>> GetSelectedAnnouncementDetails(int id)
         {
-            IList<AnnouncementRepository> array = new List<AnnouncementRepository>();
-            IList<AnnouncementRepository> array2 = new List<AnnouncementRepository>();
 
+            IList<AnnouncementEntity> allAnnouncements = new List<AnnouncementEntity>();
             foreach (AnnouncementEntity item in await Get())
-            {
-                array.Add(new AnnouncementRepository { Key = item.Id, Similarity = CompareStrings(item.Title, GetAnnouncementById(id).Result.Title) });
-            }
-            AnnouncementRepository[] res = array.OrderByDescending(x => x.Similarity).Take(3).ToArray();
+                allAnnouncements.Add(item);
 
-            // add code
+            IList<AnnouncementService> similarityAnnouncements = new List<AnnouncementService>();
 
-            return await announcementRepository.GetSelectedAnnouncementDetails(id); //add code
+            foreach (AnnouncementEntity item in allAnnouncements)
+                similarityAnnouncements.Add(new AnnouncementService { Key = item.Id, Similarity = CompareStrings(item.Title, GetAnnouncementById(id).Result.Title) });
+            AnnouncementService[] res = similarityAnnouncements.OrderByDescending(x => x.Similarity).Where(x => x.Key != id).Take(3).ToArray();
+
+            IList<AnnouncementEntity> TopAnnouncement = new List<AnnouncementEntity>();
+            TopAnnouncement.Add(await GetAnnouncementById(id));
+            foreach (AnnouncementEntity item in allAnnouncements.Where(x => x.Id == res[0].Key || x.Id == res[1].Key || x.Id == res[2].Key))
+                TopAnnouncement.Add(item);
+
+            return TopAnnouncement;
         }
         private List<IEnumerable> WordLetterPairs(string str)
         {
@@ -107,6 +114,13 @@ namespace CreationMyFirstApi.Services
                 }
             }
             return (2.0 * intersection * 100) / union;
+        }
+        public int Key { get; set; }
+        public IEnumerable<int> Key2 { get; set; }
+        public double Similarity { get; set; }
+        public AnnouncementService Merge(AnnouncementEntity p)
+        {
+            return new AnnouncementService { Key = this.Key, Similarity = this.Similarity };
         }
     }
 }
