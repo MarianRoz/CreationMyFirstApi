@@ -50,7 +50,7 @@ namespace CreationMyFirstApi.Controllers
             return new JsonResult("Deleted Announcement");
         }
         [HttpGet]
-        public async Task<IEnumerable<AnnouncementDetails>> GetSelectedAnnouncementDetails(int id)
+        public async Task<IEnumerable<AnnouncementEntity>> GetSelectedAnnouncementDetails(int id)
         {
             return await announcementService.GetSelectedAnnouncementDetails(id);
         }
