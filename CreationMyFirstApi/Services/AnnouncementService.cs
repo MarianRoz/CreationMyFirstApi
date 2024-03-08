@@ -7,7 +7,6 @@ namespace CreationMyFirstApi.Services
     public class AnnouncementService : IAnnouncementService
     {
         private readonly IAnnouncementRepository announcementRepository;
-
         public int Key { get; internal set; }
         public double Similarity { get; internal set; }
 
@@ -34,35 +33,41 @@ namespace CreationMyFirstApi.Services
         {
             return await announcementRepository.Create(announcement);
         }
-
         public async Task<AnnouncementEntity> Update(AnnouncementEntity announcement)
         {
             return await announcementRepository.Update(announcement);
         }
-
         public bool Delete(int id)
         {
             return announcementRepository.Delete(id);
         }
         public async Task<IList<AnnouncementEntity>> GetSelectedAnnouncementDetails(int id)
         {
-
-            IList<AnnouncementEntity> allAnnouncements = new List<AnnouncementEntity>();
-            foreach (AnnouncementEntity item in await Get())
-                allAnnouncements.Add(item);
-
+            IList<AnnouncementEntity> allAnnouncements = await announcementRepository.All.ToListAsync();
             IList<AnnouncementService> similarityAnnouncements = new List<AnnouncementService>();
+            AnnouncementEntity? mainAnnouncement = allAnnouncements.FirstOrDefault(x => x.Id == id);
 
-            foreach (AnnouncementEntity item in allAnnouncements)
-                similarityAnnouncements.Add(new AnnouncementService { Key = item.Id, Similarity = StringComparator.CompareStrings(item.Title, GetAnnouncementById(id).Result.Title) });
-            AnnouncementService[] res = similarityAnnouncements.OrderByDescending(x => x.Similarity).Where(x => x.Key != id).Take(3).ToArray();
+            List<AnnouncementEntity> result = allAnnouncements
+                .Select(x => new
+                {
+                    x.Date,
+                    x.Description,
+                    x.Id,
+                    x.Title,
+                    Similarity = StringComparator.CompareStrings(x.Title, mainAnnouncement.Title)
+                })
+                .OrderByDescending(x => x.Similarity)
+                .Take(3)
+                .Select(x => new AnnouncementEntity()
+                {
+                    Date = x.Date,
+                    Description = x.Description,
+                    Id = x.Id,
+                    Title = x.Title
+                })
+                .ToList();
 
-            IList<AnnouncementEntity> TopAnnouncement = new List<AnnouncementEntity>();
-            TopAnnouncement.Add(await GetAnnouncementById(id));
-            foreach (AnnouncementEntity item in allAnnouncements.Where(x => x.Id == res[0].Key || x.Id == res[1].Key || x.Id == res[2].Key))
-                TopAnnouncement.Add(item);
-
-            return TopAnnouncement;
+            return result;
         }
     }
 }

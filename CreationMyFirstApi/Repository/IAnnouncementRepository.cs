@@ -10,5 +10,7 @@ namespace CreationMyFirstApi.Repository
         Task<AnnouncementEntity> Update(AnnouncementEntity announcement);
         bool Delete(int ID);
         Task<IEnumerable<AnnouncementEntity>> GetSelectedAnnouncementDetails(IList<AnnouncementEntity> id);
+        public IQueryable<AnnouncementEntity> All { get; }
+
     }
 }
